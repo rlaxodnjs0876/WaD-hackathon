@@ -2,8 +2,12 @@ import UIKit
 
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 class OnboardingViewController: UIViewController {
+    
+    private var disposeBag = DisposeBag()
 
 //MARK: - UI
     private let logoImage = UIImageView().then {
@@ -22,14 +26,22 @@ class OnboardingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .black
+        setButton()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.navigationBar.setBackButtonToArrow()
     }
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         addSubviews()
         makeSubviewConstraints()
+    }
+    private func setButton() {
+        loginButton.rx.tap
+            .subscribe(onNext: { [ weak self ] in
+                self?.navigationController?.pushViewController(LoginViewController(), animated: true)
+            }).disposed(by: disposeBag)
     }
 }
 
