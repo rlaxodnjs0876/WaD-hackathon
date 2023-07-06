@@ -2,16 +2,22 @@ import UIKit
 
 import SnapKit
 import Then
+import RxCocoa
+import RxSwift
 
 class MainViewController: UIViewController {
+    
+    private var disposeBag = DisposeBag()
+    private var dataArray = [String]()
 
-//MARK: - UI
+    //MARK: - UI
     private let siteTextField = UITextField().then {
         $0.clearButtonMode = .always
         $0.returnKeyType = .next
         $0.layer.borderColor = UIColor.black.cgColor
         $0.layer.borderWidth = 1
         $0.layer.cornerRadius = 10
+        $0.placeholder = "ex) https://----"
         $0.addLeftPadding()
     }
     private let siteText = UILabel().then {
@@ -41,9 +47,12 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         configure()
+        setButton()
+        self.hideKeyboard()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = true
     }
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
@@ -52,8 +61,17 @@ class MainViewController: UIViewController {
     }
     private func configure() {
         self.siteListTableView.dataSource = self
-        self.siteListTableView.rowHeight = 70
+        self.siteListTableView.rowHeight = 50
         self.siteListTableView.delegate = self
+    }
+    private func setButton() {
+        addButton.rx.tap
+            .subscribe( onNext: { [ weak self ] in
+                self?.dataArray.append(self?.siteTextField.text ?? "")
+                self?.siteTextField.text = ""
+                self?.siteListTableView.reloadData()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -84,19 +102,28 @@ extension MainViewController {
             $0.leading.trailing.equalToSuperview().inset(38)
         }
         siteListTableView.snp.makeConstraints {
-            $0.top.equalTo(line.snp.bottom).offset(27)
+            $0.top.equalTo(line.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview().inset(38)
             $0.bottom.equalToSuperview()
+        }
+        addButton.snp.makeConstraints {
+            $0.bottom.equalToSuperview().inset(48)
+            $0.centerX.equalToSuperview()
+            $0.leading.trailing.equalToSuperview().inset(30)
+            $0.height.equalTo(50)
         }
     }
 }
 
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return self.dataArray.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MainTableViewCell.identifier, for: indexPath)
+        
+        cell.textLabel?.text = self.dataArray[indexPath.row]
+        
         return cell
     }
 }
