@@ -8,6 +8,9 @@ target 'WaD' do
 pod 'SnapKit'
 pod 'Then'
 pod 'RxSwift'
+pod 'Alamofire'
+pod 'RxCocoa'
+pod 'Moya'
 
   # Pods for WaD
 
