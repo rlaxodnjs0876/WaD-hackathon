@@ -29,12 +29,8 @@ class MainTableViewCell: UITableViewCell {
         super.layoutSubviews()
         addSubviews()
         makeSubviewConstraints()
-        setData()
         self.contentView.backgroundColor = .white
     }
-    func setData() {
-            self.siteAddress.text = "https://www.op.gg/?hl=ko_KR"
-        }
 }
 
 //MARK: - Layout
